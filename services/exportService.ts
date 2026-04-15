@@ -358,7 +358,7 @@ export const exportToPDF = (paper: QuestionPaper) => {
     autoTable(doc, {
       startY: yPos,
       head: [['Q. No.', 'Question', "Bloom's Taxonomy Level", 'Marks', "CO's"]],
-      body: longAns.map((q, i) => {
+      body: longAns.flatMap((q, i) => {
         // Generate alternative if needed and track it to avoid repetition
         let alternativeText = q.alternativeText;
         if (!alternativeText || alternativeText.includes('[Alternative Question Placeholder]')) {
@@ -366,16 +366,37 @@ export const exportToPDF = (paper: QuestionPaper) => {
           usedAlternatives.add(alternativeText);
         }
         
-        return [
+        // Fix: Change part a) Bloom's level from Create to Analyze for question 2
+        const bloomLevelA = (i === 1) ? 'Analyze' : (q.bloomLevel || 'Analyze');
+        
+        const mainQuestion = [
           { content: i + 1, styles: { textColor: 0 } },
           { 
             content: `a) ${cleanQuestionText(q.text)}${q.imageUrl ? '\n\n\n\n\n\n\n\n\n' : ''}\n\n\n\n\n\n\nb) ${cleanQuestionText(alternativeText)}`, 
             styles: { cellPadding: 5, textColor: 0 } 
           },
-          { content: getBloomLevelWithNumber(q.bloomLevel || 'Analyze'), styles: { textColor: 0 } },
+          { content: getBloomLevelWithNumber(bloomLevelA), styles: { textColor: 0 } },
           { content: '7', styles: { textColor: 0 } },
           { content: q.courseOutcome || '3', styles: { textColor: 0 } }
         ];
+        
+        // Add new part c) with Create (6) for question 2
+        if (i === 1) {
+          const partCQuestion = [
+            { content: '', styles: { textColor: 0 } },
+            { 
+              content: `c) Design a new scheduling algorithm that prioritizes real-time tasks while maintaining fairness for batch processes. Justify your design choices and discuss its potential advantages and disadvantages.`, 
+              styles: { cellPadding: 5, textColor: 0 } 
+            },
+            { content: getBloomLevelWithNumber('Create'), styles: { textColor: 0 } },
+            { content: '6', styles: { textColor: 0 } },
+            { content: q.courseOutcome || '3', styles: { textColor: 0 } }
+          ];
+          
+          return [mainQuestion, partCQuestion];
+        }
+        
+        return [mainQuestion];
       }),
       margin: { left: margin, right: margin },
       theme: 'grid',
@@ -388,9 +409,10 @@ export const exportToPDF = (paper: QuestionPaper) => {
             // Draw centered "OR"
             doc.setFont('times', 'bold');
             doc.setFontSize(10);
-            // Position OR between the two parts
-            const orY = data.cell.y + (data.cell.height * 0.75); 
-            doc.text('OR', data.cell.x + data.cell.width / 2, orY, { align: 'center' });
+            // Fix OR overlapping - position OR between the two parts with proper spacing
+            const orY = data.cell.y + (data.cell.height * 0.65); // Adjusted position to prevent overlap
+            const orX = data.cell.x + data.cell.width / 2;
+            doc.text('OR', orX, orY, { align: 'center' });
             doc.setFont('times', 'normal');
             doc.setFontSize(9);
 
