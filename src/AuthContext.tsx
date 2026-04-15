@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile, FirebaseUser, auth, db, doc, getDoc, setDoc, serverTimestamp } from './firebase-vercel';
+import { onAuthStateChanged, signInWithPopup, signOut, googleProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile, FirebaseUser, auth, db, doc, getDoc, setDoc, serverTimestamp } from './firebase';
 import { UserRole } from '../types';
 import { sanitizeForFirestore } from '../services/mockServices';
 
