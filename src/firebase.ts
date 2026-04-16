@@ -14,9 +14,21 @@ import {
 import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, onSnapshot, getDocFromServer, Timestamp, serverTimestamp, FieldValue } from 'firebase/firestore';
 import firebaseConfig from '../firebase-applet-config.json';
 
+// Use environment variables for production, fallback to config file for development
+const firebaseConfigProd = {
+  projectId: process.env.FIREBASE_PROJECT_ID || firebaseConfig.projectId,
+  appId: process.env.FIREBASE_APP_ID || firebaseConfig.appId,
+  apiKey: process.env.FIREBASE_API_KEY || firebaseConfig.apiKey,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN || firebaseConfig.authDomain,
+  firestoreDatabaseId: process.env.FIREBASE_DATABASE_ID || firebaseConfig.firestoreDatabaseId,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET || firebaseConfig.storageBucket,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || firebaseConfig.messagingSenderId,
+  measurementId: process.env.FIREBASE_MEASUREMENT_ID || firebaseConfig.measurementId,
+};
+
 // Initialize Firebase SDK
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+const app = initializeApp(firebaseConfigProd);
+export const db = getFirestore(app, firebaseConfigProd.firestoreDatabaseId);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 
